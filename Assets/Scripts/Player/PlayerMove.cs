@@ -12,21 +12,20 @@ public class PlayerMove : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Invoke("PausarAntesDeEmpezar", 2f);
         anim = GetComponent<Animator>();
     }
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed, Space.World);
-        anim.SetFloat("VelY", Vector3.forward.x);
-        anim.SetFloat("VelX", 0);
 
         if (Input.GetKeyDown(KeyCode.LeftArrow)) 
         {
             if (this.gameObject.transform.position.x > LevelBoundary.leftSide) 
             { 
                 transform.Translate(new Vector3(-1.5f,0,0) );
-                anim.SetFloat("VelX", -1);
+                // anim.SetFloat("VelY", 0);
+                // anim.SetFloat("VelX", -1.5f);
             }
         }
         if (Input.GetKeyDown(KeyCode.RightArrow)) 
@@ -34,8 +33,14 @@ public class PlayerMove : MonoBehaviour
             if (this.gameObject.transform.position.x < LevelBoundary.rightSide)
             {
                 transform.Translate(new Vector3(1.5f,0,0) );
-                anim.SetFloat("VelX", 1);
+                // anim.SetFloat("VelY", 0);
+                // anim.SetFloat("VelX", 1.5f);
             }
         }
+    }
+
+    private void PausarAntesDeEmpezar()
+    {
+        Debug.Log("¡Juego listo para comenzar!");
     }
 }
