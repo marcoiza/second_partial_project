@@ -277,8 +277,8 @@ MonoBehaviour:
 
     Fin del Juego'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 68950377f4340364a9871a1bd4a51e6c, type: 2}
-  m_sharedMaterial: {fileID: 9116867556008457357, guid: 68950377f4340364a9871a1bd4a51e6c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5f1c771fcfe12c84c95cf5b2bc71ee32, type: 2}
+  m_sharedMaterial: {fileID: -6303580826037018083, guid: 5f1c771fcfe12c84c95cf5b2bc71ee32, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -999,8 +999,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Continuar
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 68950377f4340364a9871a1bd4a51e6c, type: 2}
-  m_sharedMaterial: {fileID: 9116867556008457357, guid: 68950377f4340364a9871a1bd4a51e6c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5f1c771fcfe12c84c95cf5b2bc71ee32, type: 2}
+  m_sharedMaterial: {fileID: -6303580826037018083, guid: 5f1c771fcfe12c84c95cf5b2bc71ee32, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
