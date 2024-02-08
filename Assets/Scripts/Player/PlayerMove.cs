@@ -12,7 +12,6 @@ public class PlayerMove : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Invoke("PausarAntesDeEmpezar", 2f);
         anim = GetComponent<Animator>();
     }
     // Update is called once per frame
@@ -37,10 +36,5 @@ public class PlayerMove : MonoBehaviour
                 // anim.SetFloat("VelX", 1.5f);
             }
         }
-    }
-
-    private void PausarAntesDeEmpezar()
-    {
-        Debug.Log("¡Juego listo para comenzar!");
     }
 }
