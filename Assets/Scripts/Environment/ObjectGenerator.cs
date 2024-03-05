@@ -10,6 +10,7 @@ public class ObjectGenerator : MonoBehaviour
     public float initialSpeed;
     public float speedIncrease;
     private int objetosGenerados = 0; // Contador de objetos generados
+    private bool isPaused = false; // Atributo que verifica si el movimiento de los objetos debe estar en pausa
 
     void Start()
     {
@@ -22,8 +23,17 @@ public class ObjectGenerator : MonoBehaviour
 
         if (timer >= generationTime)
         {
-            timer = 0f;
-            GenerateObject();
+            if (!isPaused)
+            {
+                timer = 0f;
+                GenerateObject();
+            }
+        }
+
+        // Pausar/despausar movimiento al pulsar la tecla "P"
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            isPaused = !isPaused;
         }
     }
 
@@ -31,12 +41,15 @@ public class ObjectGenerator : MonoBehaviour
     {
         int prefabIndex = Random.Range(0, objects.Count);
         Vector3 position = GenerateRandomPosition();
-        // Instantiate(objects[prefabIndex], position, Quaternion.identity);
         GameObject objectAux = Instantiate(objects[prefabIndex], position, Quaternion.identity);
         StartCoroutine(MoveObjectIndependent(objectAux));
         objetosGenerados++; // Incrementar el contador de objetos generados
+        if (objetosGenerados == 1)
+        {
+            generationTime = 8.0f;
+        }
 
-        if (objetosGenerados >= 3 && generationTime>=1 && speedIncrease < 1f) // Comprobar si se han generado 10 objetos
+        if (objetosGenerados >= 3 && generationTime>=2 && speedIncrease < 0.05f) 
         {
             generationTime -= 0.5f; // Aumentar el tiempo de generación
             speedIncrease += 0.005f;
@@ -62,19 +75,25 @@ public class ObjectGenerator : MonoBehaviour
                 break;
         }
         float x = value;
-        //float y = transform.position.y;
-        //float z = transform.position.z;
-        return new Vector3(x, 1.2f, 0);
+        return new Vector3(x, 1.2f, 50);
     }
 
     IEnumerator MoveObjectIndependent(GameObject objectAux)
     {
         float currentSpeed = initialSpeed; // Start with initial speed
-        while (true)
+        while (objectAux != null)
         {
-            objectAux.transform.Translate(new Vector3(0, 0, -currentSpeed) * Time.deltaTime);
-            currentSpeed += speedIncrease; // Increase speed each frame
+            if (!isPaused)
+            {
+                objectAux.transform.Translate(new Vector3(0, 0, -currentSpeed) * Time.deltaTime);
+                currentSpeed += speedIncrease; // Increase speed each frame
+            }
             yield return null;
         }
+    }
+
+    public void SetPauseState(bool newState)
+    {
+        isPaused = newState;
     }
 }
