@@ -1,36 +1,45 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Collision : MonoBehaviour
 {
     public Canvas CanvasMiniGame;
-    public static bool GameIsPaused = false;
-    public GameObject MainCamera;
-    public GameObject MiniGameCamera;
-    private GameObject objectColission;
-    private Vector3 targetCanvaPosition = new Vector3(1.9f, 4.7f, 7f);
-    private Vector3 targetNextPosition = new Vector3(0f, 1.3f, -48f);
-    public int lifesPlayer = 3;
-    private int indexHearths = 0;
-    public GameObject txtMal;
-    public GameObject txtBien;
-    public int score = 0;
+    public Canvas CanvasSaveScore;
+    public GameObject mainCamera;
+    public GameObject miniGameCamera;
     public GameObject scoreBox;
+    public Image worldImageTime;
+    [SerializeField] TMP_InputField inputUsername;
+    [SerializeField] TMP_InputField inputScore;
+
+    private GameObject objectCollision;
+    private Vector3 targetCanvasPosition = new Vector3(1.9f, 4.7f, 7f);
+    private Vector3 targetNextPosition = new Vector3(0f, 1.3f, -48f);
+    private int lifesPlayer = 1;
+    private int indexHearts = 0;
+    private bool cameraMiniGameIsActive = false;
+    private float miniGameActiveTime = 5.0f; // Tiempo en segundos que la cámara MiniGame está activa
+    private float startTime;
+    private bool isFinishGame = false;
+    private bool isSavedScore = false;
+    private bool GameIsPaused = false;
+
     public List<GameObject> gameObjectsToHide = new List<GameObject>();
     public List<GameObject> gameObjectsToHideTwo = new List<GameObject>();
-    private bool cameraMiniGameIsActive = false;
-    private float miniGameActiveTime; // Tiempo en segundos que la cámara MiniGame está activa
-    private float startTime;
-    public Image worldImageTime;
+
+    public static int score { get; private set; } = 0;
+    private static string username;
+
     void Start()
     {
-        MiniGameCamera.SetActive(false);
+        miniGameCamera.SetActive(false);
         CanvasMiniGame.gameObject.SetActive(false);
+        CanvasSaveScore.gameObject.SetActive(false);
         if (scoreBox != null)
         {
             TextMeshProUGUI textMeshPro = scoreBox.GetComponent<TextMeshProUGUI>();
@@ -41,19 +50,19 @@ public class Collision : MonoBehaviour
             }
             else
             {
-                Debug.LogError("TextMeshProUGUI component not found on scoreBox.");
+                Debug.LogWarning("TextMeshProUGUI component not found on scoreBox.");
             }
         }
         else
         {
-            Debug.LogError("scoreBox is null. Check your initialization.");
+            Debug.LogWarning("scoreBox is null. Check your initialization.");
         }
         miniGameActiveTime = 5.0f;
     }
 
     void Update()
     {
-        if (cameraMiniGameIsActive)
+        if (cameraMiniGameIsActive && !isFinishGame)
         {
             float elapsedTime = Time.time - startTime;
             float fillAmount = 1.0f - Mathf.Clamp01(elapsedTime / miniGameActiveTime);
@@ -64,32 +73,50 @@ public class Collision : MonoBehaviour
                 {
                     if (!checkCorrectKeyDown())
                     {
-                        ToggleVisibilityForSpecificObjectTwo(indexHearths);
-                        ToggleVisibilityForSpecificObject(indexHearths);
-                        indexHearths += 1;
+                        ToggleVisibilityForSpecificObjectTwo(indexHearts);
+                        ToggleVisibilityForSpecificObject(indexHearts);
+                        indexHearts += 1;
                         lifesPlayer -= 1;
                         if (lifesPlayer == 0) {
-                            LoadLostScene();
+                            Pause();
+                            ChangeMiniGameCamera();
+                            inputScore.text = "" + score;
+                            CanvasSaveScore.gameObject.SetActive(true);
+                            isFinishGame = true;
+                            if (isSavedScore) {
+                                LoadLostScene();
+                            }
                         }
                     }
                     Resume();
                     ChangeMainCamera();
-                    objectColission = null;
+                    objectCollision = null;
                 }
             }
             else 
             {
-                ToggleVisibilityForSpecificObjectTwo(indexHearths);
-                ToggleVisibilityForSpecificObject(indexHearths);
-                indexHearths += 1;
+                indexHearts += 1;
                 lifesPlayer -= 1;
+                ToggleVisibilityForSpecificObjectTwo(indexHearts);
+                ToggleVisibilityForSpecificObject(indexHearts);
                 if (lifesPlayer == 0) {
-                    LoadLostScene();
+                    Pause();
+                    ChangeMiniGameCamera();
+                    inputScore.text = "" + score;
+                    CanvasSaveScore.gameObject.SetActive(true);
+                    if (isSavedScore) {
+                        LoadLostScene();
+                    }
+                    isFinishGame = true;
                 }
                 Resume();
                 ChangeMainCamera();
-                objectColission.transform.position = targetNextPosition;
-                objectColission = null;
+                objectCollision.transform.position = targetNextPosition;
+                objectCollision = null;
+            }
+        } else {
+            if (cameraMiniGameIsActive && isSavedScore) {
+                LoadLostScene();
             }
         }
         
@@ -104,8 +131,9 @@ public class Collision : MonoBehaviour
             {
                 Pause();
                 ChangeMiniGameCamera();
-                objectColission = other.gameObject;
-                other.transform.position = targetCanvaPosition;
+                CanvasMiniGame.gameObject.SetActive(true);
+                objectCollision = other.gameObject;
+                other.transform.position = targetCanvasPosition;
                 if (miniGameActiveTime > 2)
                 {
                     miniGameActiveTime -= 1.0f;
@@ -116,11 +144,18 @@ public class Collision : MonoBehaviour
             {
                 lifesPlayer -= 1;
                 if (lifesPlayer == 0) {
-                    LoadLostScene();
+                    Pause();
+                    ChangeMiniGameCamera();
+                    inputScore.text = "" + score;
+                    CanvasSaveScore.gameObject.SetActive(true);
+                    if (isSavedScore) {
+                        LoadLostScene();
+                    }
+                    isFinishGame = true;
                 } else {
-                    ToggleVisibilityForSpecificObjectTwo(indexHearths);
-                    ToggleVisibilityForSpecificObject(indexHearths);
-                    indexHearths += 1;
+                    ToggleVisibilityForSpecificObjectTwo(indexHearts);
+                    ToggleVisibilityForSpecificObject(indexHearts);
+                    indexHearts += 1;
                 }
             }
         }
@@ -133,7 +168,6 @@ public class Collision : MonoBehaviour
         // Pausar el movimiento de los objetos generados
         FindObjectOfType<ObjectGenerator>().SetPauseState(true);
         GameIsPaused = true;
-        CanvasMiniGame.gameObject.SetActive(true);
     }
 
     private void Resume()
@@ -148,22 +182,22 @@ public class Collision : MonoBehaviour
 
     void ChangeMiniGameCamera()
     {
-        MainCamera.SetActive(!MainCamera.activeSelf);
-        MiniGameCamera.SetActive(!MiniGameCamera.activeSelf);
+        mainCamera.SetActive(!mainCamera.activeSelf);
+        miniGameCamera.SetActive(!miniGameCamera.activeSelf);
         cameraMiniGameIsActive = true;
         startTime = Time.time;
     }
 
     void ChangeMainCamera()
     {
-        MiniGameCamera.SetActive(false);
-        MainCamera.SetActive(true);
+        miniGameCamera.SetActive(false);
+        mainCamera.SetActive(true);
         cameraMiniGameIsActive = false;
     }
 
     bool checkCorrectKeyDown()
     {
-        if (objectColission != null)
+        if (objectCollision != null)
         {
             Dictionary<string, KeyCode> garbageKeyMap = new Dictionary<string, KeyCode>
             {
@@ -172,14 +206,14 @@ public class Collision : MonoBehaviour
                 {"GreenGarbage", KeyCode.S},
                 {"YellowGarbage", KeyCode.D}
             };
-            if (garbageKeyMap.ContainsKey(objectColission.tag) && Input.GetKeyDown(garbageKeyMap[objectColission.tag]))
+            if (garbageKeyMap.ContainsKey(objectCollision.tag) && Input.GetKeyDown(garbageKeyMap[objectCollision.tag]))
             {
                 score += 10;
                 scoreBox.GetComponent<TextMeshProUGUI>().text = "Puntaje: " + score;
-                objectColission.transform.position = targetNextPosition;
+                objectCollision.transform.position = targetNextPosition;
                 return true;
             }
-            objectColission.transform.position = targetNextPosition;
+            objectCollision.transform.position = targetNextPosition;
         }
         return false;
     }
@@ -217,5 +251,41 @@ public class Collision : MonoBehaviour
         {
             Debug.LogWarning("Índice fuera de rango. Asegúrate de que el índice sea válido.");
         }
+    }
+    public void send()
+    {
+        username = inputUsername.text;
+        StartCoroutine(PostDataToLocalService());
+    }
+
+    IEnumerator PostDataToLocalService()
+    {
+        Debug.Log("Entra a la función");
+        string serviceUrl = "http://localhost:8000/users";
+        // Asegúrate de que la variable "score" sea un número entero
+        string jsonBody = $"{{\"username\":\"{username}\",\"score\":{score}}}";
+        
+        Debug.Log(jsonBody);
+
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonBody);
+
+        UnityWebRequest www = new UnityWebRequest(serviceUrl, "POST");
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            string responseData = www.downloadHandler.text;
+            // Procesa la respuesta después del POST según tus necesidades
+            Debug.Log(responseData);
+        }
+        else
+        {
+            Debug.LogError(www.error);
+        }
+        isSavedScore = true;
     }
 }

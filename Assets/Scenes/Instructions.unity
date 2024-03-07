@@ -728,7 +728,7 @@ GameObject:
   - component: {fileID: 468379787}
   - component: {fileID: 468379786}
   m_Layer: 5
-  m_Name: txtContinue
+  m_Name: txtReturn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -773,7 +773,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Continuar
+  m_text: Volver
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5f1c771fcfe12c84c95cf5b2bc71ee32, type: 2}
   m_sharedMaterial: {fileID: -6303580826037018083, guid: 5f1c771fcfe12c84c95cf5b2bc71ee32, type: 2}
@@ -2070,7 +2070,7 @@ GameObject:
   - component: {fileID: 1662794423}
   - component: {fileID: 1662794422}
   m_Layer: 5
-  m_Name: Button
+  m_Name: btnReturnHome
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2094,7 +2094,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 596, y: -463}
-  m_SizeDelta: {x: 220, y: 60}
+  m_SizeDelta: {x: 220, y: 65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1662794422
 MonoBehaviour:
